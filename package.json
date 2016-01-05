@@ -29,6 +29,9 @@
   },
   "homepage": "https://github.com/bahmutov/copi#readme",
   "dependencies": {
+    "check-more-types": "2.10.0",
+    "glob-promise": "1.0.4",
+    "lazy-ass": "1.3.0",
     "simple-bin-help": "1.5.0"
   },
   "devDependencies": {
@@ -37,7 +40,9 @@
   },
   "config": {
     "pre-git": {
-      "commit-msg": ["simple"],
+      "commit-msg": [
+        "simple"
+      ],
       "pre-commit": [
         "npm run lint",
         "npm test"
