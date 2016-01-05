@@ -16,8 +16,8 @@ function seconds (n) {
   return n * 1000
 }
 
-const filenamesCache = makeCache(__dirname + '/../.package-filenames.json', seconds(300))
-const packagesCache = makeCache(__dirname + '/../.packages.json', seconds(300))
+const filenamesCache = makeCache(__dirname + '/../.package-filenames.json', seconds(3600))
+const packagesCache = makeCache(__dirname + '/../.packages.json', seconds(3600))
 
 function loadDb (rootFolder) {
   la(is.unemptyString(rootFolder), 'expected root folder', rootFolder)
@@ -49,11 +49,14 @@ function install (options, db) {
   la(is.object(options), 'missing options', options)
   la(is.unemptyString(options.name), 'missing name', options)
   la(is.has(db, 'find'), 'missing find method in db')
+
   const found = db.find(options.name)
+
   if (!found || !found.latest) {
     console.error('Could not find locally installed "%s", using NPM to install', options.name)
     return npm.install({
-      name: options.name
+      name: options.name,
+      flags: options.flags
     })
   }
   console.log('found %s@%s among %d candidate(s)',
@@ -62,8 +65,10 @@ function install (options, db) {
 
   la(is.unemptyString(found.folder), 'missing founder in found object', found)
   return npm.install({
-    name: found.folder
+    name: found.folder,
+    flags: options.flags
   })
+  // TODO overwrite the folder with exact version
 }
 
 function copi (options) {

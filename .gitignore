@@ -3,3 +3,4 @@ node_modules/
 .package-filenames.json
 .packages.json
 npm-debug.log
+.DS_Store
