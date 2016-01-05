@@ -1,19 +1,20 @@
 {
   "name": "copi",
-  "version": "1.0.0",
   "description": "Installs NPM package by finding it and copying from another local folder. Completely offline ;)",
   "main": "src/copi.js",
+  "version": "0.0.0-semantic-release",
   "bin": {
     "copi": "bin/copi.js"
   },
   "scripts": {
     "test": "node --harmony node_modules/.bin/rocha src/*-spec.js",
     "lint": "standard bin/*.js src/*.js",
-    "commit": "commit-wizard"
+    "commit": "commit-wizard",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bahmutov/copi.git"
+    "url": "https://github.com/bahmutov/copi.git"
   },
   "keywords": [
     "npm",
@@ -40,7 +41,8 @@
   "devDependencies": {
     "pre-git": "3.1.2",
     "rocha": "1.6.1",
-    "standard": "5.4.1"
+    "standard": "5.4.1",
+    "semantic-release": "^4.3.5"
   },
   "config": {
     "pre-git": {
