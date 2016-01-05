@@ -7,7 +7,9 @@
     "copi": "bin/copi.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run lint",
+    "lint": "standard bin/*.js src/*.js",
+    "commit": "commit-wizard"
   },
   "repository": {
     "type": "git",
@@ -28,5 +30,21 @@
   "homepage": "https://github.com/bahmutov/copi#readme",
   "dependencies": {
     "simple-bin-help": "1.5.0"
+  },
+  "devDependencies": {
+    "pre-git": "3.1.2",
+    "standard": "5.4.1"
+  },
+  "config": {
+    "pre-git": {
+      "commit-msg": ["simple"],
+      "pre-commit": [
+        "npm run lint",
+        "npm test"
+      ],
+      "pre-push": [],
+      "post-commit": [],
+      "post-merge": []
+    }
   }
 }

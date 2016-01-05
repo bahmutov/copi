@@ -18,5 +18,5 @@ require('simple-bin-help')({
 }, args)
 
 const name = args[2]
-console.log('installing %s', name)
+require(__dirname + '/..')({ name: name })
 
