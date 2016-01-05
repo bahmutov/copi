@@ -16,6 +16,57 @@ function seconds (n) {
   return n * 1000
 }
 
+const fs = require('fs')
+const exists = fs.existsSync
+const join = require('path').join
+
+function isSaveFlag (flag) {
+  return is.string(flag) &&
+    (flag === '-S' ||
+      flag === '-D' ||
+      flag === '--save' ||
+      flag === '--save-dev')
+}
+
+function saveFlag (flags) {
+  return is.array(flags) &&
+    flags.some(isSaveFlag)
+}
+
+function setInstalledVersion (name, sourceFolder) {
+  const packageFilename = join(process.cwd(), 'package.json')
+  if (!exists(packageFilename)) {
+    return
+  }
+  const sourceFilename = join(sourceFolder, 'package.json')
+  if (!exists(sourceFolder)) {
+    console.error('Cannot find package in', sourceFolder)
+    return
+  }
+  const sourcePackage = JSON.parse(fs.readFileSync(sourceFilename, 'utf-8'))
+  const sourceVersion = sourcePackage.version
+  if (!is.unemptyString(sourceVersion)) {
+    console.error('Invalid version in file', sourceFilename)
+    return
+  }
+  const pkg = JSON.parse(fs.readFileSync(packageFilename, 'utf-8'))
+  var changed
+  if (pkg.dependencies && pkg.dependencies[name]) {
+    pkg.dependencies[name] = sourceVersion
+    changed = true
+  }
+  if (pkg.devDependencies && pkg.devDependencies[name]) {
+    pkg.devDependencies[name] = sourceVersion
+    changed = true
+  }
+  if (changed) {
+    fs.writeFileSync(packageFilename, JSON.stringify(pkg, null, 2), 'utf-8')
+    debug('saved updated version %s@%s in %s', name, sourceVersion, packageFilename)
+  } else {
+    debug('could not save updated version %s@%s in %s', name, sourceVersion, packageFilename)
+  }
+}
+
 const filenamesCache = makeCache(__dirname + '/../.package-filenames.json', seconds(3600))
 const packagesCache = makeCache(__dirname + '/../.packages.json', seconds(3600))
 
@@ -67,8 +118,11 @@ function install (options, db) {
   return npm.install({
     name: found.folder,
     flags: options.flags
+  }).then(function () {
+    if (saveFlag(options.flags)) {
+      setInstalledVersion(options.name, found.folder)
+    }
   })
-  // TODO overwrite the folder with exact version
 }
 
 function copi (options) {
