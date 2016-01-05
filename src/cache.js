@@ -1,6 +1,7 @@
 const is = require('check-more-types')
 const la = require('lazy-ass')
 const fs = require('fs')
+const debug = require('debug')('copi')
 
 function saveData (filename, data) {
   la(is.unemptyString(filename), 'missing filename', filename)
@@ -10,7 +11,7 @@ function saveData (filename, data) {
     timestamp: new Date()
   }
   fs.writeFileSync(filename, JSON.stringify(withTimestamp, null, 2), 'utf-8')
-  console.log('saved data to %s', filename)
+  debug('saved data to %s', filename)
   return data
 }
 
@@ -25,7 +26,7 @@ function loadData (maxAge, filename) {
 
   const now = new Date()
   const elapsed = now - new Date(withTimestamp.timestamp)
-  console.log('elapsed', elapsed, 'ms, maxAge', maxAge)
+  debug('cache age', elapsed, 'ms, maxAge', maxAge)
   if (elapsed > maxAge) {
     return null
   }

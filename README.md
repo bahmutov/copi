@@ -18,6 +18,11 @@
 If an existing local copy of `<module name>` is not found, `copi` calls standard
 `npm install <module name> <flags ...>` automatically.
 
+See `copi` in action below: installing a local project, then handling new project and
+installing it from the registry
+
+[![asciicast](https://asciinema.org/a/33013.png)](https://asciinema.org/a/33013)
+
 ## What?!
 
 After surveying developers, I found that most have a single folder with bunch of projects,

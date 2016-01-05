@@ -15,8 +15,16 @@ function removeFlag (s) {
 
 const removeInstall = isNotWord.bind(null, 'install')
 const removeI = isNotWord.bind(null, 'i')
+const removeNode = (s) => {
+  return !/bin\/node$/.test(s)
+}
+const removeCopi = (s) => {
+  return !/bin\/copi$/.test(s)
+}
 
 const args = process.argv
+  .filter(removeNode)
+  .filter(removeCopi)
   .filter(removeInstall)
   .filter(removeI)
   .filter(removeFlag)
@@ -30,7 +38,7 @@ require('simple-bin-help')({
   help: 'use: copi <npm package name>'
 }, args)
 
-const name = args[2]
+const name = args[0]
 require(__dirname + '/..')({
   name: name,
   flags: flags
