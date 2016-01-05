@@ -1,0 +1,32 @@
+{
+  "name": "copi",
+  "version": "1.0.0",
+  "description": "Installs NPM package by finding it and copying from another local folder. Completely offline ;)",
+  "main": "src/copi.js",
+  "bin": {
+    "copi": "bin/copy.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bahmutov/copi.git"
+  },
+  "keywords": [
+    "npm",
+    "install",
+    "offline",
+    "cp",
+    "local"
+  ],
+  "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bahmutov/copi/issues"
+  },
+  "homepage": "https://github.com/bahmutov/copi#readme",
+  "dependencies": {
+    "simple-bin-help": "1.5.0"
+  }
+}
