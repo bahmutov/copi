@@ -4,6 +4,9 @@ const la = require('lazy-ass')
 const is = require('check-more-types')
 const makeCache = require('./cache')
 const db = require('./db')
+const npm = require('npm-utils')
+
+la(is.fn(npm.install), 'missing npm.install method')
 
 function findPackageFiles (folder) {
   return glob(folder + '/*/node_modules/*/package.json')
@@ -48,12 +51,19 @@ function install (options, db) {
   la(is.has(db, 'find'), 'missing find method in db')
   const found = db.find(options.name)
   if (!found || !found.latest) {
-    console.error('Could not find locally installed "%s", please use NPM to install', options.name)
-    return
+    console.error('Could not find locally installed "%s", using NPM to install', options.name)
+    return npm.install({
+      name: options.name
+    })
   }
   console.log('found %s@%s among %d candidate(s)',
     options.name, found.latest, found.candidates.length)
   debug(found)
+
+  la(is.unemptyString(found.folder), 'missing founder in found object', found)
+  return npm.install({
+    name: found.folder
+  })
 }
 
 function copi (options) {
