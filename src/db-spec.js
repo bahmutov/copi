@@ -35,6 +35,32 @@ describe('building db of packages', () => {
   it('builds db from filenames', () => {
     const db = build(filenames, loadFile)
     la(is.object(db), 'returns an object', db)
-    console.log(db)
+  })
+
+  it('can search', () => {
+    const db = build(filenames, loadFile)
+    la(is.fn(db.find), 'has find method')
+  })
+
+  it('can find the latest "bar"', () => {
+    const db = build(filenames, loadFile)
+    const found = db.find('bar')
+    la(is.object(found), 'found an object', found)
+    la(found.latest === bar2Package.version, 'wrong version', found)
+  })
+
+  it('can find the latest "baz"', () => {
+    const db = build(filenames, loadFile)
+    const found = db.find('baz')
+    la(is.object(found), 'found an object', found)
+    la(found.latest === bazPackage.version, 'wrong version', found)
+  })
+
+  it('can search several times', () => {
+    const db = build(filenames, loadFile)
+    const found1 = db.find('baz')
+    la(found1.latest === bazPackage.version, 'wrong version', found1)
+    const found2 = db.find('baz')
+    la(found2.latest === bazPackage.version, 'wrong version', found2)
   })
 })
