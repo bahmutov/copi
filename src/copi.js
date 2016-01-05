@@ -2,6 +2,7 @@ const glob = require('glob-promise')
 const is = require('check-more-types')
 const la = require('lazy-ass')
 const makeCache = require('./cache')
+const db = require('./db')
 
 function findPackageFiles (folder) {
   return glob(folder + '/*/node_modules/*/package.json')
@@ -11,7 +12,8 @@ function seconds (n) {
   return n * 1000
 }
 
-const filenamesCache = makeCache(__dirname + '/../.found-packages.json', seconds(300))
+const filenamesCache = makeCache(__dirname + '/../.package-filenames.json', seconds(300))
+const packagesCache = makeCache(__dirname + '/../.packages.json', seconds(300))
 
 function copi (options) {
   console.log('installing %s', options.name)
@@ -31,6 +33,8 @@ function copi (options) {
       return filenames
     })
     .then(filenamesCache.save)
+    .then(db)
+    .then(packagesCache.save)
     .catch(console.error.bind(console))
 }
 

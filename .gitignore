@@ -1,2 +1,4 @@
 node_modules/
 .found-packages.json
+.package-filenames.json
+.packages.json
