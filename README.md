@@ -38,8 +38,8 @@ each using NPM packages. Thus we have the directory structure looking like this
 Imagine we start a new project "projectC", and it needs module "async". We can quickly
 install it using `npm install /dev/projectA/node_modules/async` **if we knew where it was!**
 
-'copi' finds all the packages already installed, and finds the latest version of the one
-needed (lazily). Thus the installation is offline and **fast**.
+`copi` finds all the packages already installed, and finds the latest version of the one
+needed (lazily). Thus the installation is offline.
 
     copi -S lodash
     found lodash@3.0.6 among 1 candidate(s)
@@ -47,8 +47,14 @@ needed (lazily). Thus the installation is offline and **fast**.
     projectC@1.0.0 /dev/projectC
     └── lodash@3.0.6
 
+## Details
+
 The found packages are stored in a temp file, which will be updated if it is older than N hours,
 ensuring newly installed packages are discovered eventually.
+
+The wildcard that searches for all installed packages looks at the working folder's parent,
+and then down two levels. Should discover most of the packages without spending more than a
+couple of seconds (if the cache of filenames is old or non-existent).
 
 ### Small print
 
