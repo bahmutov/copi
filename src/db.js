@@ -1,8 +1,16 @@
 const is = require('check-more-types')
 const la = require('lazy-ass')
-const read = require('fs').readFileSync
+const readSync = require('fs').readFileSync
+const exists = require('fs').existsSync
 const dirname = require('path').dirname
 const semver = require('semver')
+
+function readPackage (filename) {
+  if (!exists(filename)) {
+    return
+  }
+  return JSON.parse(readSync(filename, 'utf-8'))
+}
 
 function isPackageFile (str) {
   return /\/package\.json$/.test(str)
@@ -66,13 +74,17 @@ function find (db, loadFile, name) {
 }
 
 function buildPackageDatabase (filenames, loadFile) {
-  la(is.array(filenames), 'expected list of package filenames', filenames)
-  loadFile = loadFile || read
+  loadFile = loadFile || readPackage
   la(is.fn(loadFile), 'invalid load file', loadFile)
 
-  const db = {}
+  const db = is.object(filenames) ? filenames : {}
   db.find = find.bind(null, db, loadFile)
+  if (is.object(filenames)) {
+    // done, we are just restoring an object
+    return db
+  }
 
+  la(is.array(filenames), 'expected list of package filenames', filenames)
   const infos = filenames.map(function (filename) {
     la(isPackageFile(filename), 'not a package filename', filename)
     const parts = filename.split('/')
