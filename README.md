@@ -6,6 +6,50 @@
 [![Build status][copi-ci-image] ][copi-ci-url]
 [![semantic-release][semantic-image] ][semantic-url]
 
+## Install
+
+    npm install -g copi
+
+## Use
+
+    copi <module name>
+    copi <module name> --save | --save-dev | -S | -D
+
+If an existing local copy of `<module name>` is not found, `copi` calls standard
+`npm install <module name> <flags ...>` automatically.
+
+## What?!
+
+After surveying developers, I found that most have a single folder with bunch of projects,
+each using NPM packages. Thus we have the directory structure looking like this
+
+    /dev
+        /projectA
+            package.json
+            /node_modules
+                /lodash
+                /async
+        /projectB
+            package.json
+            /node_modules
+                /lazy-ass
+                /check-more-types
+
+Imagine we start a new project "projectC", and it needs module "async". We can quickly
+install it using `npm install /dev/projectA/node_modules/async` **if we knew where it was!**
+
+'copi' finds all the packages already installed, and finds the latest version of the one
+needed (lazily). Thus the installation is offline and **fast**.
+
+    copi -S lodash
+    found lodash@3.0.6 among 1 candidate(s)
+    installing /dev/projectA/node_modules/lodash
+    projectC@1.0.0 /dev/projectC
+    └── lodash@3.0.6
+
+The found packages are stored in a temp file, which will be updated if it is older than N hours,
+ensuring newly installed packages are discovered eventually.
+
 ### Small print
 
 Author: Gleb Bahmutov &copy; 2016
