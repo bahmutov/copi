@@ -16,7 +16,7 @@ function removeFlag (s) {
 const removeInstall = isNotWord.bind(null, 'install')
 const removeI = isNotWord.bind(null, 'i')
 const removeNode = (s) => {
-  return !/bin\/node$/.test(s)
+  return s !== 'node' && !/bin\/node$/.test(s)
 }
 const removeCopi = (s) => {
   return !/bin\/copi$/.test(s)
