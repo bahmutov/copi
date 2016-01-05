@@ -1,15 +1,15 @@
 #!/usr/bin/env node --harmony
 
-function isWord (word, str) {
-  return word === str
+function isNotWord (word, str) {
+  return word !== str
 }
 
-const installWord = isWord.bind(null, 'install')
-const installWord = isWord.bind(null, 'i')
+const removeInstall = isNotWord.bind(null, 'install')
+const removeI = isNotWord.bind(null, 'i')
 
 const args = process.argv
-  .filter(installWord)
-  .filter(iWord)
+  .filter(removeInstall)
+  .filter(removeI)
 
 require('simple-bin-help')({
   minArguments: 1,
@@ -17,6 +17,6 @@ require('simple-bin-help')({
   help: 'use: copi <npm package name>'
 }, args)
 
-const name = args[0]
+const name = args[2]
 console.log('installing %s', name)
 
