@@ -1,3 +1,4 @@
+const debug = require('debug')('copi')
 const glob = require('glob-promise')
 const la = require('lazy-ass')
 const is = require('check-more-types')
@@ -46,11 +47,13 @@ function install (options, db) {
   la(is.unemptyString(options.name), 'missing name', options)
   la(is.has(db, 'find'), 'missing find method in db')
   const found = db.find(options.name)
-  if (!found) {
+  if (!found || !found.latest) {
     console.error('Could not find locally installed "%s", please use NPM to install', options.name)
     return
   }
-  console.log('found info for "%s"', options.name, found)
+  console.log('found %s@%s among %d candidate(s)',
+    options.name, found.latest, found.candidates.length)
+  debug(found)
 }
 
 function copi (options) {

@@ -1,3 +1,4 @@
+const debug = require('debug')('copi')
 const is = require('check-more-types')
 const la = require('lazy-ass')
 const readSync = require('fs').readFileSync
@@ -42,7 +43,7 @@ function find (db, loadFile, name) {
     return info
   }
   la(is.array(info.candidates), 'info for', name, 'has not candidates', info)
-  console.log('searching for latest package "%s" among %d candidates',
+  debug('searching for latest package "%s" among %d candidates',
     name, info.candidates.length)
 
   const setLatest = (path, version) => {
