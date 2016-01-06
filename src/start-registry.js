@@ -3,9 +3,8 @@ function start () {
 
   return new Promise(function (resolve) {
     const server = app.listen(function () {
-      const host = server.address().address
       const port = server.address().port
-      const url = 'http://' + host + ':' + port
+      const url = 'http://localhost:' + port
       console.log('Started registry app at %s', url)
       resolve({
         url: url,
@@ -25,7 +24,8 @@ if (!module.parent) {
         const npm = require('npm-utils')
         npm.install({
           name: 'foo',
-          registry: info.url
+          registry: info.url,
+          flags: ['--verbose']
         })
       })
       .catch(console.error.bind(console))
