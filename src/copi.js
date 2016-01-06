@@ -29,12 +29,16 @@ function install (options, db) {
 
   return startRegistry(db.find)
     .then(function (registry) {
+      la(is.webUrl(registry.url), 'missing registry url', registry)
+      la(is.object(registry.server), 'missing server itself', registry)
+
       return npm.install({
         name: found.name,
         flags: options.flags,
         registry: registry.url
       }).then(function () {
         debug('finished install', found.name)
+        registry.server.close()
         // if (saveFlag(options.flags)) {
         //   setInstalledVersion(options.name, found.folder)
         // }
