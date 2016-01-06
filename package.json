@@ -6,12 +6,15 @@
   "bin": {
     "copi": "bin/copi.js"
   },
+  "preferGlobal": true,
+  "private": false,
   "scripts": {
     "test": "node --harmony node_modules/.bin/rocha src/*-spec.js",
     "lint": "standard bin/*.js src/*.js",
     "commit": "commit-wizard",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "issues": "git-issues"
+    "issues": "git-issues",
+    "size": "t=\"$(npm pack .)\"; wc -c \"${t}\"; tar tvf \"${t}\"; rm \"${t}\";"
   },
   "repository": {
     "type": "git",
@@ -48,6 +51,10 @@
     "semantic-release": "^4.3.5",
     "standard": "5.4.1"
   },
+  "files": [
+    "src/*.js",
+    "!src/*-spec.js"
+  ],
   "config": {
     "pre-git": {
       "commit-msg": [
