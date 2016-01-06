@@ -1,3 +1,4 @@
+const debug = require('debug')('copi')
 const la = require('lazy-ass')
 const is = require('check-more-types')
 
@@ -17,7 +18,50 @@ function makeRegistry (find, options) {
   const express = require('express')
   const morgan = require('morgan')
   const app = express()
-  const debug = require('debug')('copi')
+
+  function getTarball (req, res) {
+    console.log('tarball for %s@%s', req.params.name, req.params.version)
+
+    const found = find(req.params.name)
+    if (!found) {
+      return res.status(404).send({})
+    }
+    debug('found package %s latest %s in %s',
+      found.name, found.latest, found.folder)
+    if (!found.name ||
+      !found.latest ||
+      !found.folder) {
+      console.error('invalid found info', found)
+      return res.status(404).send({})
+    }
+
+    if (found.latest !== req.params.version) {
+      console.error('latest %s does not match request %s for %s',
+        found.latest, req.params.version, found.name)
+      return res.status(404).send({})
+    }
+
+    npm.pack({ folder: found.folder })
+      .then(function (tarballFilename) {
+        debug('built tar archive for %s %s', found.name, tarballFilename)
+        if (!tarballFilename) {
+          console.error('cannot find tar', tarballFilename)
+          return res.status(500).send({})
+        }
+
+        const length = fs.statSync(tarballFilename).size
+        res.set('content-type', 'application/octet-stream')
+        res.set('content-length', length)
+        const fileStream = fs.createReadStream(tarballFilename)
+        fileStream.pipe(res)
+        fileStream.on('end', function () {
+          debug('sent tarball %s for %s@%s', tarballFilename,
+            found.name, found.latest)
+          fs.unlinkSync(tarballFilename)
+        })
+        fileStream.on('error', console.error.bind(console))
+      })
+  }
 
   // see example metadata using command
   // http http://registry.npmjs.org/foo
@@ -54,7 +98,7 @@ function makeRegistry (find, options) {
     }
     pkg.versions = {}
 
-    const tarUrl = options.url + '/' + found.name + '/-/' + found.name + '-' + found.latest + '.tgz'
+    const tarUrl = options.url + '/tarballs/' + found.name + '/' + found.latest + '.tgz'
 
     npm.pack({ folder: found.folder })
       .then(function (tarballFilename) {
@@ -79,6 +123,7 @@ function makeRegistry (find, options) {
 
   app.use(morgan('dev'))
   app.get('/:name', getPackageMetadata)
+  app.get('/tarballs/:name/:version.tgz', getTarball)
 
   return app
 }
