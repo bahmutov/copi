@@ -12,6 +12,9 @@ function getPackage (folder) {
 const npm = require('npm-utils')
 const fileShasum = require('./file-shasum')
 
+// this is read-only registry inspired by
+// https://github.com/nolanlawson/local-npm/blob/master/index.js
+
 function makeRegistry (find, options) {
   la(is.fn(find), 'missing find package function')
 
@@ -122,6 +125,7 @@ function makeRegistry (find, options) {
   }
 
   app.use(morgan('dev'))
+  // the only registry API needed
   app.get('/:name', getPackageMetadata)
   app.get('/tarballs/:name/:version.tgz', getTarball)
 
