@@ -61,6 +61,10 @@ The wildcard that searches for all installed packages looks at the working folde
 and then down two levels. Should discover most of the packages without spending more than a
 couple of seconds (if the cache of filenames is old or non-existent).
 
+To avoid going to NPM for nested dependencies, `copi` spins a simple read-only NPM
+registry server. Thus `npm install` command goes back to `copi` for additional packages,
+making sure we find those locally.
+
 ### Small print
 
 Author: Gleb Bahmutov &copy; 2016
