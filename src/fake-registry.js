@@ -1,15 +1,8 @@
 const debug = require('debug')('copi')
 const la = require('lazy-ass')
 const is = require('check-more-types')
-
-const fs = require('fs')
-const read = fs.readFileSync
-const join = require('path').join
-function getPackage (folder) {
-  return JSON.parse(read(join(folder, 'package.json'), 'utf-8'))
-}
-
 const npm = require('npm-utils')
+const fs = require('fs')
 const fileShasum = require('./file-shasum')
 
 // this is read-only registry inspired by
@@ -94,7 +87,7 @@ function makeRegistry (find, options) {
     }
     la(is.unemptyString(options.url), 'missing server url in', options)
 
-    const pkg = getPackage(found.folder)
+    const pkg = npm.getPackage(found.folder)
     // add information about available versions
     pkg['dist-tags'] = {
       latest: found.latest
