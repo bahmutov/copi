@@ -1,15 +1,21 @@
-function start () {
-  const app = require('./fake-registry')
+const is = require('check-more-types')
+const la = require('lazy-ass')
+
+function start (find) {
+  la(is.fn(find), 'expected find function')
+
+  const options = {}
+  const makeRegistry = require('./fake-registry')
+  const app = makeRegistry(find, options)
 
   return new Promise(function (resolve) {
     const server = app.listen(function () {
       const port = server.address().port
       const url = 'http://localhost:' + port
       console.log('Started registry app at %s', url)
-      resolve({
-        url: url,
-        server: server
-      })
+      options.url = url
+      options.server = server
+      resolve(options)
     })
   })
 }
@@ -18,16 +24,20 @@ module.exports = start
 
 if (!module.parent) {
   !(function tryRegistry () {
-    start()
-      .then(function (info) {
-        console.log('running registry server at', info.url)
-        const npm = require('npm-utils')
-        npm.install({
-          name: 'foo',
-          registry: info.url,
-          flags: ['--verbose']
-        })
+    const loadDb = require('./load-db')
+    loadDb()
+      .then(function (db) {
+        start(db.find)
+          .then(function (info) {
+            console.log('running registry server at', info.url)
+            const npm = require('npm-utils')
+            npm.install({
+              name: 'foo',
+              registry: info.url,
+              flags: ['--verbose']
+            })
+          })
+          .catch(console.error.bind(console))
       })
-      .catch(console.error.bind(console))
   }())
 }

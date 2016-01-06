@@ -88,9 +88,7 @@ function install (options, db) {
 
 function copi (options) {
   console.log('installing %s', options.name)
-
-  const rootFolder = options.folder || process.cwd() + '/../'
-  return loadDb(rootFolder)
+  return loadDb(options.folder)
     .then(install.bind(null, options))
     .catch(console.error.bind(console))
 }

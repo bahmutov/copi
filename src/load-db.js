@@ -19,7 +19,9 @@ const filenamesCache = makeCache(__dirname + '/../.package-filenames.json', seco
 const packagesCache = makeCache(__dirname + '/../.packages.json', seconds(3600))
 
 function loadDb (rootFolder) {
+  rootFolder = rootFolder || process.cwd() + '/../'
   la(is.unemptyString(rootFolder), 'expected root folder', rootFolder)
+
   return Promise.resolve(packagesCache.load())
     .then(function (dbData) {
       if (!dbData) {
