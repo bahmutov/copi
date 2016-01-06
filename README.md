@@ -23,6 +23,11 @@ installing it from the registry
 
 [![asciicast](https://asciinema.org/a/33013.png)](https://asciinema.org/a/33013)
 
+## Limitation
+
+If the package to be installed is not found locally, `copi` starts the regular
+`npm install` command; there is nothing we can do offline if we don't have the data.
+
 ## What?!
 
 After surveying developers, I found that most have a single folder with bunch of projects,
@@ -62,7 +67,8 @@ and then down two levels. Should discover most of the packages without spending 
 couple of seconds (if the cache of filenames is old or non-existent).
 
 To avoid going to NPM for nested dependencies, `copi` spins a simple read-only NPM
-registry server. Thus `npm install` command goes back to `copi` for additional packages,
+registry server *while copi is running*. 
+Thus `npm install` command goes back to `copi` for additional packages,
 making sure we find those locally.
 
 ### Small print

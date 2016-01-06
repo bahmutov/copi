@@ -25,7 +25,9 @@
     "install",
     "offline",
     "cp",
-    "local"
+    "copy",
+    "local",
+    "registry"
   ],
   "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
   "license": "MIT",
