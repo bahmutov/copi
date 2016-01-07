@@ -75,6 +75,11 @@ registry server *while copi is running*.
 Thus `npm install` command goes back to `copi` for additional packages,
 making sure we find those locally.
 
+### Debugging
+
+Run the `DEBUG=copi copi <module name>` command, 
+this package uses [debug](https://www.npmjs.com/package/debug)
+
 ### Small print
 
 Author: Gleb Bahmutov &copy; 2016

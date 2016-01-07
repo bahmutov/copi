@@ -16,7 +16,7 @@ function seconds (n) {
 }
 
 const cacheFolder = __dirname + '/../'
-const maxAge = seconds(0)
+const maxAge = seconds(600)
 const filenamesCache = makeCache(cacheFolder + '.package-filenames.json', maxAge)
 const packagesCache = makeCache(cacheFolder + '.packages.json', maxAge)
 
