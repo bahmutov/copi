@@ -28,6 +28,10 @@ installing it from the registry
 If the package to be installed is not found locally, `copi` starts the regular
 `npm install` command; there is nothing we can do offline if we don't have the data.
 
+Some packages run `prepublish` step which might fail in the already installed folder,
+when `copi` tries to pack them for install. These packages cannot be packed correctly
+and cannot be installed, sorry.
+
 ## What?!
 
 After surveying developers, I found that most have a single folder with bunch of projects,

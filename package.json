@@ -36,6 +36,7 @@
   },
   "homepage": "https://github.com/bahmutov/copi#readme",
   "dependencies": {
+    "bluebird": "3.1.1",
     "check-more-types": "2.10.0",
     "debug": "2.2.0",
     "express": "4.13.3",

@@ -4,6 +4,7 @@ const is = require('check-more-types')
 const npm = require('npm-utils')
 const fs = require('fs')
 const fileShasum = require('./file-shasum')
+const Promise = require('bluebird')
 
 // this is read-only registry inspired by
 // https://github.com/nolanlawson/local-npm/blob/master/index.js
@@ -46,7 +47,9 @@ function makeRegistry (find, options) {
     const folder = found.versions[req.params.version]
     la(is.unemptyString(folder), 'expected folder for version',
       req.params.version, 'in', found.versions)
-    npm.pack(folder)
+
+    debug('building archive for %s from %s', found.name, folder)
+    npm.pack({ folder: folder })
       .then(function (tarballFilename) {
         debug('built tar archive for %s@%s %s',
           found.name, req.params.version, tarballFilename)
@@ -137,16 +140,17 @@ function makeRegistry (find, options) {
         })
     }
 
-    Promise.all(versions.map(versionInfo))
-      .then(function (distInfos) {
-        la(is.array(distInfos), 'could not compute shas', distInfos)
-        distInfos.forEach(function (dist) {
+    Promise.map(versions, versionInfo, { concurrency: 10 })
+      .then(distInfos => {
+        distInfos.forEach(dist => {
+          la(is.object(dist) && is.unemptyString(dist.version),
+            'invalid dist object', dist)
           pkg.versions[dist.version] = {
             dist: dist
           }
         })
-        res.json(pkg)
       })
+      .then(() => res.json(pkg))
   }
 
   app.use(morgan('dev'))
