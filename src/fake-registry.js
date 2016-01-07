@@ -24,8 +24,8 @@ function makeRegistry (find, options) {
       return res.status(404).send({})
     }
 
-    console.log('found package')
-    console.log(found)
+    // console.log('found package')
+    // console.log(found)
 
     debug('found package "%s" latest version %s, looking for version %s',
       found.name, found.latest, req.params.version)
