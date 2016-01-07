@@ -32,9 +32,9 @@ if (!module.parent) {
             console.log('running registry server at', info.url)
             const npm = require('npm-utils')
             npm.install({
-              name: 'debug',
-              registry: info.url,
-              flags: ['--verbose']
+              name: 'ms@0.6.2',
+              registry: info.url
+              // flags: ['--verbose']
             })
           })
           .catch(console.error.bind(console))

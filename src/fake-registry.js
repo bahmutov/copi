@@ -22,6 +22,10 @@ function makeRegistry (find, options) {
     if (!found) {
       return res.status(404).send({})
     }
+
+    console.log('found package')
+    console.log(found)
+
     debug('found package %s latest %s in %s',
       found.name, found.latest, found.folder)
     if (!found.name ||
@@ -59,12 +63,28 @@ function makeRegistry (find, options) {
       })
   }
 
+  function shaForPacked (folder) {
+    return npm.pack({ folder: folder })
+      .then(function (tarballFilename) {
+        debug('built tar archive %s from folder %s', tarballFilename, folder)
+        if (!tarballFilename) {
+          throw new Error('Cannot tar folder ' + folder)
+        }
+        return fileShasum(tarballFilename)
+          .then(function (shasum) {
+            // delete tar for now
+            fs.unlinkSync(tarballFilename)
+            return shasum
+          })
+      })
+  }
+
   // see example metadata using command
   // http http://registry.npmjs.org/foo
   // it is like package.json with additional
   // object "versions"
   // with each key a valid version
-  // and "dist" object
+  // and "dist" object. The url format can be different
   /*
     "dist": {
       "shasum": "943e0ec03df00ebeb6273a5b94b916ba54b47581",
@@ -94,26 +114,32 @@ function makeRegistry (find, options) {
     }
     pkg.versions = {}
 
-    const tarUrl = options.url + '/tarballs/' + found.name + '/' + found.latest + '.tgz'
+    la(is.object(found.versions) && is.not.empty(found.versions),
+      'cannot find versions in', found)
+    const versions = Object.keys(found.versions)
 
-    npm.pack({ folder: found.folder })
-      .then(function (tarballFilename) {
-        debug('built tar archive for %s %s', found.name, tarballFilename)
-        if (!tarballFilename) {
-          return res.status(500).send({})
-        }
-        return fileShasum(tarballFilename)
-          .then(function (shasum) {
-            pkg.versions[found.latest] = {
-              dist: {
-                shasum: shasum,
-                tarball: tarUrl
-              }
-            }
-            // delete tar for now
-            fs.unlinkSync(tarballFilename)
-            res.json(pkg)
-          })
+    function versionInfo (version) {
+      const folder = found.versions[version]
+      return shaForPacked(folder)
+        .then(function (shasum) {
+          const tarUrl = options.url + '/tarballs/' + found.name + '/' + version + '.tgz'
+          return {
+            version: version,
+            shasum: shasum,
+            tarball: tarUrl
+          }
+        })
+    }
+
+    Promise.all(versions.map(versionInfo))
+      .then(function (distInfos) {
+        la(is.array(distInfos), 'could not compute shas', distInfos)
+        distInfos.forEach(function (dist) {
+          pkg.versions[dist.version] = {
+            dist: dist
+          }
+        })
+        res.json(pkg)
       })
   }
 
