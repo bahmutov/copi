@@ -26,8 +26,8 @@ function makeRegistry (find, options) {
     console.log('found package')
     console.log(found)
 
-    debug('found package %s latest %s in %s',
-      found.name, found.latest, found.folder)
+    debug('found package "%s" latest version %s, looking for version %s',
+      found.name, found.latest, req.params.version)
     if (!found.name ||
       !found.latest ||
       !found.folder) {
@@ -35,17 +35,23 @@ function makeRegistry (find, options) {
       return res.status(404).send({})
     }
 
-    if (found.latest !== req.params.version) {
-      console.error('latest %s does not match request %s for %s',
-        found.latest, req.params.version, found.name)
+    la(is.object(found.versions) &&
+      is.not.empty(found.versions), 'missing verions', found)
+    if (!found.versions[req.params.version]) {
+      console.error('Cannot find version %s@%s among %s',
+        req.params.version, found.name, Object.keys(found.versions).join(','))
       return res.status(404).send({})
     }
 
-    npm.pack({ folder: found.folder })
+    const folder = found.versions[req.params.version]
+    la(is.unemptyString(folder), 'expected folder for version',
+      req.params.version, 'in', found.versions)
+    npm.pack(folder)
       .then(function (tarballFilename) {
-        debug('built tar archive for %s %s', found.name, tarballFilename)
+        debug('built tar archive for %s@%s %s',
+          found.name, req.params.version, tarballFilename)
         if (!tarballFilename) {
-          console.error('cannot find tar', tarballFilename)
+          console.error('cannot find tar', tarballFilename, 'from', folder)
           return res.status(500).send({})
         }
 

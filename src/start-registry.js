@@ -30,12 +30,13 @@ if (!module.parent) {
         start(db.find)
           .then(function (info) {
             console.log('running registry server at', info.url)
+            /*
             const npm = require('npm-utils')
             npm.install({
               name: 'ms@0.6.2',
               registry: info.url
               // flags: ['--verbose']
-            })
+            })*/
           })
           .catch(console.error.bind(console))
       })

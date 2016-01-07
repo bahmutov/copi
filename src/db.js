@@ -49,7 +49,7 @@ function addCandidateInfo (info, path, version) {
 }
 
 // lazy finding - returns all versions
-function find (db, loadFile, name) {
+function find (db, loadFile, fileExists, name) {
   la(is.unemptyString(name), 'missing package to find', name)
   const info = db[name]
   if (!info) {
@@ -59,15 +59,22 @@ function find (db, loadFile, name) {
   la(info.name === name, 'different name, searching for %s, found %s',
     name, info.name)
 
-  if (info.latest) {
+  if (info.latest && fileExists(info.folder)) {
     debug('found latest version for %s', name)
     return info
   }
 
   la(is.object(info.versions), 'expected object with versions', info)
   if (is.not.empty(info.versions)) {
-    debug('returning prefilled info for candidate', name)
-    return info
+    const valid = Object.keys(info.versions).every(function (version) {
+      const folder = info.versions[version]
+      return fileExists(folder)
+    })
+    if (valid) {
+      debug('every version folder still exists for', name)
+      debug('returning prefilled info for candidate', name)
+      return info
+    }
   }
 
   la(is.array(info.candidates), 'info for', name, 'has not candidates', info)
@@ -75,6 +82,10 @@ function find (db, loadFile, name) {
     name, info.candidates.length)
 
   info.candidates.forEach(function (candidatePath) {
+    if (!fileExists(candidatePath)) {
+      // maybe the folder has been moved or deleted
+      return
+    }
     const pkg = loadFile(candidatePath)
     if (!is.object(pkg)) {
       console.error('could not read %s', candidatePath)
@@ -89,12 +100,15 @@ function find (db, loadFile, name) {
   return info
 }
 
-function buildPackageDatabase (filenames, loadFile) {
+function buildPackageDatabase (filenames, loadFile, fileExists) {
   loadFile = loadFile || readPackage
   la(is.fn(loadFile), 'invalid load file', loadFile)
 
+  fileExists = fileExists || exists
+  la(is.fn(fileExists), 'invalid file exists', fileExists)
+
   const db = is.object(filenames) ? filenames : {}
-  db.find = find.bind(null, db, loadFile)
+  db.find = find.bind(null, db, loadFile, fileExists)
   if (is.object(filenames)) {
     // done, we are just restoring an object
     return db
