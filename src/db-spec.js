@@ -63,4 +63,17 @@ describe('building db of packages', () => {
     const found2 = db.find('baz')
     la(found2.latest === bazPackage.version, 'wrong version', found2)
   })
+
+  it('has info about different versions', () => {
+    const db = build(filenames, loadFile)
+    const bar = db.find('bar')
+    la(is.object(bar))
+    la(is.semver(bar.latest))
+    la(bar.latest === bar2Package.version)
+    la(is.object(bar.versions), 'has versions', bar)
+    la(is.unemptyString(bar.versions[barPackage.version]),
+      'has first version', bar)
+    la(is.unemptyString(bar.versions[bar2Package.version]),
+      'has second version', bar)
+  })
 })

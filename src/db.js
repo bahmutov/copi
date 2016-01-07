@@ -29,7 +29,26 @@ function isLaterVersion (a, b) {
   return semver.gt(a, b)
 }
 
-// lazy finding
+function addCandidateInfo (info, path, version) {
+  la(is.object(info.versions), 'cannot find versions in', info)
+  la(is.unemptyString(path), 'expected path', path)
+  la(is.semver(version), 'expected semver', version)
+
+  const folder = dirname(path)
+
+  if (!info.latest || isLaterVersion(version, info.latest)) {
+    info.latest = version
+    info.folder = folder
+  }
+
+  if (!info.versions[version]) {
+    info.versions[version] = folder
+  }
+
+  return info
+}
+
+// lazy finding - returns all versions
 function find (db, loadFile, name) {
   la(is.unemptyString(name), 'missing package to find', name)
   const info = db[name]
@@ -39,20 +58,21 @@ function find (db, loadFile, name) {
   }
   la(info.name === name, 'different name, searching for %s, found %s',
     name, info.name)
-  if (info.latest) {
-    return info
-  }
-  la(is.array(info.candidates), 'info for', name, 'has not candidates', info)
-  debug('searching for latest package "%s" among %d candidates',
-    name, info.candidates.length)
 
-  const setLatest = (path, version) => {
-    la(is.unemptyString(path), 'expected path', path)
-    la(is.semver(version), 'expected semver', version)
-    info.latest = version
-    info.folder = dirname(path)
+  if (info.latest) {
+    debug('found latest version for %s', name)
     return info
   }
+
+  la(is.object(info.versions), 'expected object with versions', info)
+  if (is.not.empty(info.versions)) {
+    debug('returning prefilled info for candidate', name)
+    return info
+  }
+
+  la(is.array(info.candidates), 'info for', name, 'has not candidates', info)
+  debug('filtering candidates for "%s" among %d candidates',
+    name, info.candidates.length)
 
   info.candidates.forEach(function (candidatePath) {
     const pkg = loadFile(candidatePath)
@@ -64,13 +84,8 @@ function find (db, loadFile, name) {
       console.error('could not read semver from %s got', candidatePath, pkg.version)
       return
     }
-    if (!info.latest) {
-      setLatest(candidatePath, pkg.version)
-    } else if (isLaterVersion(pkg.version, info.latest)) {
-      setLatest(candidatePath, pkg.version)
-    }
+    addCandidateInfo(info, candidatePath, pkg.version)
   })
-
   return info
 }
 
@@ -102,7 +117,8 @@ function buildPackageDatabase (filenames, loadFile) {
         name: info.name,
         candidates: [],
         latest: undefined,
-        folder: undefined
+        folder: undefined,
+        versions: {}
       }
     }
     updateCandidates(db, info)

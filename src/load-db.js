@@ -15,8 +15,10 @@ function seconds (n) {
   return n * 1000
 }
 
-const filenamesCache = makeCache(__dirname + '/../.package-filenames.json', seconds(3600))
-const packagesCache = makeCache(__dirname + '/../.packages.json', seconds(3600))
+const cacheFolder = __dirname + '/../'
+const maxAge = seconds(0)
+const filenamesCache = makeCache(cacheFolder + '.package-filenames.json', maxAge)
+const packagesCache = makeCache(cacheFolder + '.packages.json', maxAge)
 
 function loadDb (rootFolder) {
   rootFolder = rootFolder || process.cwd() + '/../'
