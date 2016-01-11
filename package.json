@@ -55,6 +55,7 @@
     "standard": "5.4.1"
   },
   "files": [
+    "bin",
     "src/*.js",
     "!src/*-spec.js"
   ],
